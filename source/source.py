@@ -48,8 +48,8 @@ def DFS_visit(G, u):
     tiempo += 1
     u["inicio"] = tiempo
     u["color"] = "gris"
-    for _, v_id in G.out_edges(u["id"]):  # todos los verices que salen de u[id] "devuelve el nombre"
-        v = G.nodes[v_id]  # v sera el nodo con el identificador del nombre "diccionario de los atributos de v"
+    for _, v_id in G.out_edges(u["id"]): 
+        v = G.nodes[v_id]
         if v["color"] == "blanco":
             v["padre"] = u
             DFS_visit(G, v)
@@ -57,16 +57,13 @@ def DFS_visit(G, u):
     tiempo += 1
     u["fin"] = tiempo
 
-
-def DFS(G):
+def DFS(G, s):
     global tiempo
-    for _, u in G.nodes(data=True):  # _: id, u: data
+    for _, u in G.nodes(data = True): # _: id, u: data
         u["color"] = "blanco"
         u["padre"] = None
     tiempo = 0
-    for _, u in G.nodes(data=True):
-        if u["color"] == "blanco":
-            DFS_visit(G, u)
+    DFS_visit(G, s)
 
 
 ################### Implementacion de Print-Path ##########################
@@ -112,20 +109,20 @@ def Dijkstra(Grafo, inicio, meta):
 
 ######################## Entorno de Pruebas ##########################
 
-n = 4
-G = grafo_tablero(n)
+def test_recorrido(n, inicio, fin, alg):  
+    global tiempo
+    tiempo = 0
+    G = grafo_tablero(n)
+    camino = []
+    origen = G.nodes[inicio] # posicion del jugador
+    destino = G.nodes[fin]
+    alg(G, origen)
+    hallar_camino(G, origen, destino, camino)
+    print(camino)
 
-nx.draw(G, with_labels=True)
-global tiempo
-tiempo = 0
-# DFS(G)
+test_recorrido(4, 1, 7, BFS)
+test_recorrido(4, 1, 7, DFS)
 
-
-camino = []
-origen = G.nodes[1]  # posicion del jugador
-destino = G.nodes[7]
-
-BFS(G, origen)
 
 # hallar_camino(G, origen, destino, camino)
 # print(camino)
@@ -134,6 +131,7 @@ BFS(G, origen)
 #print(G.has_edge(1,2))
 #print(G.get_edge_data(1,2))
 #print(G[1].items())
-Dijkstra(G,1,15)
+Grafo = grafo_tablero(4)
+Dijkstra(Grafo,1,15)
 
 
