@@ -2,6 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from collections import deque
 
+
 def grafo_tablero(n):
     count = 0
     G = nx.DiGraph()
