@@ -20,4 +20,4 @@ def grafo_tablero(n):
 n = 4
 G = grafo_tablero(n)
 
-nx.draw(G, with_labels = True)
+nx.draw(G, with_labels = True)  
