@@ -9,26 +9,27 @@ def grafo_tablero(n):
     for x in range(n):
         for y in range(n):
             count += 1
-            if not (y == n - 1): # enlace  horizontal
-                G.add_edge(count, count + 1, peso = 1)
-                G.add_edge(count + 1, count, peso = 1)
-            if not (x == n - 1): # enlace vertical
-                G.add_edge(count, count + n, peso = 1)
-                G.add_edge(count + n, count, peso = 1)
+            if not (y == n - 1):  # enlace  horizontal
+                G.add_edge(count, count + 1, peso=1)
+                G.add_edge(count + 1, count, peso=1)
+            if not (x == n - 1):  # enlace vertical
+                G.add_edge(count, count + n, peso=1)
+                G.add_edge(count + n, count, peso=1)
             G.nodes[count]["id"] = count
     return G
 
+
 ############################### implementacion BFS ##########################
 def BFS(G, s):
-    for _, u in G.nodes(data = True):
+    for _, u in G.nodes(data=True):
         u["color"] = "blanco"
-        u["distancia"] = None # infinito
+        u["distancia"] = None  # infinito
         u["padre"] = None
     s["color"] = "gris"
     s["distancia"] = 0
     s["padre"] = None
     Q = deque()
-    Q.append(s) # enqueue
+    Q.append(s)  # enqueue
     while not (Q == deque([])):
         u = Q.popleft()
         for _, v in G.edges(u["id"]):
@@ -36,9 +37,10 @@ def BFS(G, s):
             if nodo["color"] == "blanco":
                 nodo["color"] = "gris"
                 nodo["distancia"] = u["distancia"] + 1
-                nodo["padre"] = u # u["id"]
+                nodo["padre"] = u  # u["id"]
                 Q.append(nodo)
         u["color"] = "negro"
+
 
 ############################### implementacion DFS ##########################
 def DFS_visit(G, u):
@@ -46,8 +48,8 @@ def DFS_visit(G, u):
     tiempo += 1
     u["inicio"] = tiempo
     u["color"] = "gris"
-    for _, v_id in G.out_edges(u["id"]): # todos los verices que salen de u[id] "devuelve el nombre"
-        v = G.nodes[v_id] # v sera el nodo con el identificador del nombre "diccionario de los atributos de v"
+    for _, v_id in G.out_edges(u["id"]):  # todos los verices que salen de u[id] "devuelve el nombre"
+        v = G.nodes[v_id]  # v sera el nodo con el identificador del nombre "diccionario de los atributos de v"
         if v["color"] == "blanco":
             v["padre"] = u
             DFS_visit(G, v)
@@ -55,13 +57,14 @@ def DFS_visit(G, u):
     tiempo += 1
     u["fin"] = tiempo
 
+
 def DFS(G):
     global tiempo
-    for _, u in G.nodes(data = True): # _: id, u: data
+    for _, u in G.nodes(data=True):  # _: id, u: data
         u["color"] = "blanco"
         u["padre"] = None
     tiempo = 0
-    for _, u in G.nodes(data = True):
+    for _, u in G.nodes(data=True):
         if u["color"] == "blanco":
             DFS_visit(G, u)
 
@@ -77,11 +80,9 @@ def hallar_camino(G, s, v, camino):
         camino.append(v["id"])
 
 
-
 ################### Implementacion de Dijkstra ##########################
 def Dijkstra(Grafo, inicio, meta):
     shrt = {}  # Grabar el costo para llegar al nodo, shrt de shortpath
-    trk_pre = {}  # Graba el camino que nos llevo al nodo, trk de track
     nddesc = Grafo  # itera el grafo completo
     inf = 999999  # Solamente un numero grande, que sera mas grande que los pesos de los nodos
     path = []  # grabar el camino de regreso al nodo, el mas optimo
@@ -97,45 +98,42 @@ def Dijkstra(Grafo, inicio, meta):
                 min_dist = node
             elif shrt[node] < shrt[min_dist]:
                 min_dist = node
-            opciones = Grafo[min_dist].items()
-            for hijos, peso in opciones:
-                if peso + shrt[min_dist] < shrt[hijos]:
-                    shrt[hijos] = peso + shrt[min_dist]
-                    trk_pre[hijos] = min_dist
-            nddesc.pop(min_dist)
-    NodoActual = meta()
-    while NodoActual != inicio:
-        try:
 
-            NodoActual = trk_pre[NodoActual]
-        except KeyError:
-            path.insert(0, NodoActual)
-            print("El camino es no viable")
-            break
+        opciones = Grafo.edges(min_dist, data = "peso")
+        for origen,hijos, peso in opciones:
+            if peso + shrt[min_dist] < shrt[hijos]:
+                shrt[hijos] = peso + shrt[min_dist]
+        nddesc.remove_node(min_dist)
+    NodoActual = meta
     path.insert(0, inicio)
+    if shrt[meta] != inf:
+        print("El paso mas corto hacia "+str(meta)+" desde "+str(inicio)+" es a traves de " + str(shrt[meta]))
+
 
 ######################## Entorno de Pruebas ##########################
 
 n = 4
 G = grafo_tablero(n)
 
-nx.draw(G, with_labels = True)
+nx.draw(G, with_labels=True)
 global tiempo
 tiempo = 0
-#DFS(G)
+# DFS(G)
 
 
 camino = []
-origen = G.nodes[1] # posicion del jugador
+origen = G.nodes[1]  # posicion del jugador
 destino = G.nodes[7]
 
 BFS(G, origen)
 
-hallar_camino(G, origen, destino, camino)
-print(camino)
+# hallar_camino(G, origen, destino, camino)
+# print(camino)
+
+# print(G.edges.data("peso",default=2))
+#print(G.has_edge(1,2))
+#print(G.get_edge_data(1,2))
+#print(G[1].items())
+Dijkstra(G,1,15)
 
 
-for i in G:
-    print(G[i])
-    
-Dijkstra(Grafo=G,inicio="1", meta="12")
