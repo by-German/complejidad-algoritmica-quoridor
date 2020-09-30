@@ -7,13 +7,11 @@ class Player:
 		self.y = columna
 		self.G = 0
 		self.n = n
-		self.turn = False # OJITO AQUII
+		self.turn = False 
 		self.mov_x = 0
 		self.mov_y = 0
 		self.origen = 0
 		self.destino = 0
-		# x_mid = x + (x / 2)
-		# y_mid = y + (y / 2)
 
 	def event_key(self, event):
 		pass
@@ -28,9 +26,8 @@ class Player:
 		pass
 
 
-	def next_movement(self, origen, destino): # orgigen posicion jugador
+	def next_movement(self, origen, destino, G): # orgigen posicion jugador
 		camino = []
-		G = self.G
 		self.BFS(G, G.nodes[origen])
 		self.hallar_camino(G, G.nodes[origen], G.nodes[destino], camino)
 		if len(camino) == 1:
@@ -39,7 +36,8 @@ class Player:
 
 	def BFS(self, G, s):
 		for _, u in G.nodes(data=True):
-			u["color"] = "blanco"
+			if u["color"] != "negro":
+				u["color"] = "blanco"
 			u["distancia"] = None  # infinito
 			u["padre"] = None
 		s["color"] = "gris"

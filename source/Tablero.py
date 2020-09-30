@@ -23,6 +23,7 @@ class Tablero:
                     G.add_edge(count + n, count, peso=1)
                 matriz[x][y] = count
                 G.nodes[count]["id"] = count
+                G.nodes[count]["color"] = "blanco" ###########
         self.G = G
         self.matriz = matriz
         print(self.matriz)
@@ -52,16 +53,22 @@ class Tablero:
 
     def update(self): 
         # self.place_player()
+        self.update_map()
         self.players_path()
         self.turn_management()
         self.win()
 
+    def update_map(self):
+        ####
+        # for player in self.players:
+        #     self.G.nodes[player.origen]["color"] = "negro"
+        ####
+        pass
+
     def turn_management(self):
         for i in range(len(self.players)):
-            print(i)
             if self.players[i].turn == True:
                 if i == len(self.players) - 1:
-                    print("sadas")
                     self.players[0].turn = True
                     self.players[i].turn = False
                     return
@@ -73,31 +80,28 @@ class Tablero:
         for player in self.players:
             if player.origen == player.destino:
                 # eliminarlo de la lista puede ser
-                print("win player")
+                # print("win player")
+                pass
 
     def players_path(self): 
         for player in self.players:
             if player.turn:
-                destino = player.next_movement(player.origen, player.destino)
+                self.G.nodes[player.origen]["color"] = "blanco"
+                destino = player.next_movement(player.origen, player.destino, self.G.copy())
                 self.player_go_to(player, destino)
                 player.origen = destino
+                self.G.nodes[player.origen]["color"] = "negro"
                 pygame.time.delay(1000)  
-
-                # player.draw(self.screen)
-                # pygame.display.flip()
 
     def place_player(self): # mover a los jugadors flechas
         if self.event.type == pygame.KEYDOWN or self.event.type == pygame.KEYUP:
             for player in self.players:
                 if player.turn and self.event.key == pygame.K_UP:
                     self.move_player_key(player, mov_y = - player.mov_y)
-
                 if player.turn and self.event.key == pygame.K_DOWN:
                     self.move_player_key(player, mov_y = player.mov_y)
-
                 if player.turn and self.event.key == pygame.K_RIGHT:
                     self.move_player_key(player, mov_x = player.mov_x)
-
                 if player.turn and self.event.key == pygame.K_LEFT:
                     self.move_player_key(player, mov_x = - player.mov_x)
 
@@ -147,4 +151,13 @@ class Tablero:
         player.y +=  player.mov_y * fil
         player.origen = self.matriz[fil][col]
         
-        
+
+    def player_jump(self, player):
+        if player.origen == players[0].origen - 1: # left
+            self.move_player_key(player, mov_x = - player.mov_x)
+        elif destino == player.origen + 1: # right
+            self.move_player_key(player, mov_x = player.mov_x)    
+        elif destino < player.origen: # down
+            self.move_player_key(player, mov_y = - player.mov_y)
+        elif destino > player.origen: # up
+            self.move_player_key(player, mov_y = player.mov_y)

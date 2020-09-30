@@ -5,9 +5,10 @@ pygame.init()
 
 size = (600, 600)
 screen = pygame.display.set_mode(size)
+pygame.display.set_caption("Quoridor")
 clock = pygame.time.Clock() # no  usar para medir los tiempos en el algortimo.
 
-quoridor = Quoridor(size, 27, 4)
+quoridor = Quoridor(size, 15, 4)
 
 while True:
     for event in pygame.event.get():
