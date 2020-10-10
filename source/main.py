@@ -18,6 +18,3 @@ while True:
     quoridor.render(screen, size)
     pygame.display.flip()
     quoridor.update()
-
-
-
