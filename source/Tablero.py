@@ -26,7 +26,6 @@ class Tablero:
                 G.nodes[count]["color"] = "blanco" ###########
         self.G = G
         self.matriz = matriz
-        print(self.matriz)
         
     def event_key(self, event):
         # self.event = event
@@ -86,7 +85,7 @@ class Tablero:
     def players_path(self): 
         for player in self.players:
             if player.turn:
-                self.G.nodes[player.origen]["color"] = "blanco"
+                self.G.nodes[player.origen]["color"] = "blanco" 
                 destino = player.next_movement(player.origen, player.destino, self.G.copy())
                 self.player_go_to(player, destino)
                 player.origen = destino
@@ -141,7 +140,6 @@ class Tablero:
             player.mov_x = player.x * 2
             player.mov_y = player.y * 2
             player.destino = des[col]
-            print("destino: ", player.destino)
             self.pos_player(player, pos[fil], pos[col]) # index col and fil = 0
             col += 1
             fil -= 1

@@ -35,11 +35,6 @@ class Player:
 		return camino[1]
 
 	def BFS(self, G, s):
-		for _, u in G.nodes(data=True):
-			if u["color"] != "negro":
-				u["color"] = "blanco"
-			u["distancia"] = None  # infinito
-			u["padre"] = None
 		s["color"] = "gris"
 		s["distancia"] = 0
 		s["padre"] = None
@@ -52,7 +47,7 @@ class Player:
 				if nodo["color"] == "blanco":
 					nodo["color"] = "gris"
 					nodo["distancia"] = u["distancia"] + 1
-					nodo["padre"] = u  # u["id"]
+					nodo["padre"] = u # -> u = nodo
 					Q.append(nodo)
 			u["color"] = "negro"
 		return
