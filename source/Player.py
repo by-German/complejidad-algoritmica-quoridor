@@ -2,24 +2,20 @@ import pygame
 from collections import deque
 
 class Player:
-	def __init__(self, fila, columna, n):
+	def __init__(self, fila, columna, n, color):
 		self.x = fila
 		self.y = columna
-		self.G = 0
 		self.n = n
 		self.turn = False 
-		self.mov_x = 0
-		self.mov_y = 0
 		self.origen = 0
 		self.destino = 0
-
+		self.color = color
 	def event_key(self, event):
 		pass
 	
 	def draw(self, screen):
-		color = (255,0,0)
 		tam = int(200 / self.n )
-		pygame.draw.circle(screen, color, (self.x, self.y), tam)
+		pygame.draw.circle(screen, self.color, (self.x, self.y), tam)
 
 	def update(self):
 
@@ -30,9 +26,9 @@ class Player:
 		camino = []
 		self.BFS(G, G.nodes[origen])
 		self.hallar_camino(G, G.nodes[origen], G.nodes[destino], camino)
-		if len(camino) == 1:
+		if len(camino) == 1: # llego al destino
 			return camino[0]
-		return camino[1]
+		return camino[1] #camino[:2] # return 2 next positions
 
 	def BFS(self, G, s):
 		s["color"] = "gris"

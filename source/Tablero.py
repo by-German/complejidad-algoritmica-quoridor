@@ -3,28 +3,30 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from collections import deque
 
+from os import system
+
+color = [(0,0,255), (0,255,0),(255,0,0), (0,255,255)]
 clock = pygame.time.Clock()
 
 class Tablero:
     def __init__(self, n = 9, players = []):
         self.n = n
         self.players = players
-        G = nx.DiGraph()
+        self.G = nx.DiGraph()
         matriz = [[ 0 for column in range(n)] for fila in range(n)]
         count = 0
         for x in range(n):
             for y in range(n):
                 count += 1
                 if not (y == n - 1):  # enlace  horizontal
-                    G.add_edge(count, count + 1, peso=1)
-                    G.add_edge(count + 1, count, peso=1)  
+                    self.G.add_edge(count, count + 1, peso=1)
+                    self.G.add_edge(count + 1, count, peso=1)  
                 if not (x == n - 1):  # enlace vertical
-                    G.add_edge(count, count + n, peso=1)
-                    G.add_edge(count + n, count, peso=1)
+                    self.G.add_edge(count, count + n, peso=1)
+                    self.G.add_edge(count + n, count, peso=1)
                 matriz[x][y] = count
-                G.nodes[count]["id"] = count
-                G.nodes[count]["color"] = "blanco" ###########
-        self.G = G
+                self.G.nodes[count]["id"] = count
+                self.G.nodes[count]["color"] = "blanco" ###########
         self.matriz = matriz
         
     def event_key(self, event):
@@ -47,79 +49,63 @@ class Tablero:
 
     def start(self, size):
         self.place__player_init(size)
-        self.players[0].turn = True
-        pass
+        self.players[0].turn = True 
 
     def update(self): 
-        # self.place_player()
-        self.update_map()
         self.players_path()
-        self.turn_management()
-        self.win()
+        if self.can_change_turn: 
+            self.turn_management()
+        self.console(True)
 
-    def update_map(self):
-        ####
-        # for player in self.players:
-        #     self.G.nodes[player.origen]["color"] = "negro"
-        ####
-        pass
+    def console(self, active):
+        if active:
+            system("cls")
+            for player in self.players:
+                print("destino: ", player.destino, "origen: ", player.origen, "TURNO:", player.turn)
+            print("......................")
 
     def turn_management(self):
         for i in range(len(self.players)):
             if self.players[i].turn == True:
-                if i == len(self.players) - 1:
+                if i == len(self.players) - 1: # analizo a todos los jugadores
                     self.players[0].turn = True
                     self.players[i].turn = False
                     return
                 self.players[i + 1].turn = True
                 self.players[i].turn = False
-                return
-        
-    def win(self):
-        for player in self.players:
-            if player.origen == player.destino:
-                # eliminarlo de la lista puede ser
-                # print("win player")
-                pass
+                return  
+
+    def player_jump(self, destino) -> bool:
+        for enemies in self.players:
+            if destino == enemies.origen:
+                return False
+        return True
 
     def players_path(self): 
         for player in self.players:
             if player.turn:
-                self.G.nodes[player.origen]["color"] = "blanco" 
                 destino = player.next_movement(player.origen, player.destino, self.G.copy())
                 self.player_go_to(player, destino)
+                if player.origen != player.destino:
+                    # devuelve si encuentra un jugador em el destino: false
+                    self.can_change_turn = self.player_jump(destino)
+                    # to be: analizar dos movimientos decidir saltar
                 player.origen = destino
-                self.G.nodes[player.origen]["color"] = "negro"
-                pygame.time.delay(1000)  
-
-    def place_player(self): # mover a los jugadors flechas
-        if self.event.type == pygame.KEYDOWN or self.event.type == pygame.KEYUP:
-            for player in self.players:
-                if player.turn and self.event.key == pygame.K_UP:
-                    self.move_player_key(player, mov_y = - player.mov_y)
-                if player.turn and self.event.key == pygame.K_DOWN:
-                    self.move_player_key(player, mov_y = player.mov_y)
-                if player.turn and self.event.key == pygame.K_RIGHT:
-                    self.move_player_key(player, mov_x = player.mov_x)
-                if player.turn and self.event.key == pygame.K_LEFT:
-                    self.move_player_key(player, mov_x = - player.mov_x)
+                pygame.time.delay(500)
 
     def player_go_to(self, player, destino):
         if destino == player.origen - 1:
-            self.move_player_key(player, mov_x = - player.mov_x)
+            self.move_player(player, mov_x = - player.mov_x)
         elif destino == player.origen + 1:
-            self.move_player_key(player, mov_x = player.mov_x)    
+            self.move_player(player, mov_x = player.mov_x)    
         elif destino < player.origen:
-            self.move_player_key(player, mov_y = - player.mov_y)
+            self.move_player(player, mov_y = - player.mov_y)
         elif destino > player.origen:
-            self.move_player_key(player, mov_y = player.mov_y)
+            self.move_player(player, mov_y = player.mov_y)
 
-    def move_player_key(self, player, mov_x = 0, mov_y = 0):
+    def move_player(self, player, mov_x = 0, mov_y = 0):
         player.x += mov_x
         player.y += mov_y
-        # player.turn = False
-
-
 
     def place__player_init(self, size):
         self.size = size
@@ -147,15 +133,4 @@ class Tablero:
     def pos_player(self, player, fil, col):
         player.x +=  player.mov_x * col
         player.y +=  player.mov_y * fil
-        player.origen = self.matriz[fil][col]
-        
-
-    def player_jump(self, player):
-        if player.origen == players[0].origen - 1: # left
-            self.move_player_key(player, mov_x = - player.mov_x)
-        elif destino == player.origen + 1: # right
-            self.move_player_key(player, mov_x = player.mov_x)    
-        elif destino < player.origen: # down
-            self.move_player_key(player, mov_y = - player.mov_y)
-        elif destino > player.origen: # up
-            self.move_player_key(player, mov_y = player.mov_y)
+        player.origen = self.matriz[fil][col]   
