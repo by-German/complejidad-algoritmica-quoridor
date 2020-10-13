@@ -11,11 +11,11 @@ clock = pygame.time.Clock() # no  usar para medir los tiempos en el algortimo.
 quoridor = Quoridor(size, 9, 4)
 
 while True:
-    for event in pygame.event.get():
-        # quoridor.event_key(event)
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
     quoridor.render(screen, size)
     pygame.display.flip()
     quoridor.update()
+    for event in pygame.event.get():
+        quoridor.event(event)
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()

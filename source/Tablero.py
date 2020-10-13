@@ -1,8 +1,7 @@
 import pygame
 import networkx as nx
-import matplotlib.pyplot as plt
 from collections import deque
-
+# temp
 from os import system
 
 color = [(0,0,255), (0,255,0),(255,0,0), (0,255,255)]
@@ -12,24 +11,21 @@ class Tablero:
     def __init__(self, n = 9, players = []):
         self.n = n
         self.players = players
-        self.G = nx.DiGraph()
+        self.G = nx.path_graph(n)
+        self.G.remove_node(0)
         matriz = [[ 0 for column in range(n)] for fila in range(n)]
         count = 0
         for x in range(n):
             for y in range(n):
                 count += 1
-                if not (y == n - 1):  # enlace  horizontal
-                    self.G.add_edge(count, count + 1, peso=1)
-                    self.G.add_edge(count + 1, count, peso=1)  
-                if not (x == n - 1):  # enlace vertical
-                    self.G.add_edge(count, count + n, peso=1)
-                    self.G.add_edge(count + n, count, peso=1)
+                if not (y == n - 1): self.G.add_edge(count, count + 1, peso=1)
+                if not (x == n - 1): self.G.add_edge(count + n, count, peso=1)
                 matriz[x][y] = count
                 self.G.nodes[count]["id"] = count
-                self.G.nodes[count]["color"] = "blanco" ###########
+                self.G.nodes[count]["color"] = "blanco" 
         self.matriz = matriz
         
-    def event_key(self, event):
+    def event(self, event):
         # self.event = event
         pass
 
@@ -49,13 +45,13 @@ class Tablero:
 
     def start(self, size):
         self.place__player_init(size)
-        self.players[0].turn = True 
+        self.players[0].turn = True
 
     def update(self): 
         self.players_path()
         if self.can_change_turn: 
             self.turn_management()
-        self.console(True)
+        self.console(False)
 
     def console(self, active):
         if active:
@@ -75,7 +71,7 @@ class Tablero:
                 self.players[i].turn = False
                 return  
 
-    def player_jump(self, destino) -> bool:
+    def can_player_jump(self, destino):
         for enemies in self.players:
             if destino == enemies.origen:
                 return False
@@ -85,12 +81,13 @@ class Tablero:
         for player in self.players:
             if player.turn:
                 destino = player.next_movement(player.origen, player.destino, self.G.copy())
+                # if destino == pos.enemy -> lanzar bfs, en la pos del enemigo           
                 self.player_go_to(player, destino)
-                if player.origen != player.destino:
+                if player.origen != player.destino: # todos lleguen destino
                     # devuelve si encuentra un jugador em el destino: false
-                    self.can_change_turn = self.player_jump(destino)
+                    self.can_change_turn = self.can_player_jump(destino)
                     # to be: analizar dos movimientos decidir saltar
-                player.origen = destino
+                player.origen = destino # mueve al jugador en el grafo
                 pygame.time.delay(500)
 
     def player_go_to(self, player, destino):
@@ -134,3 +131,4 @@ class Tablero:
         player.x +=  player.mov_x * col
         player.y +=  player.mov_y * fil
         player.origen = self.matriz[fil][col]   
+
