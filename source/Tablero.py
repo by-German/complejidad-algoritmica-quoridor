@@ -9,6 +9,7 @@ clock = pygame.time.Clock()
 
 class Tablero:
     def __init__(self, n = 9, players = []):
+        self.g_coord = True
         self.n = n
         self.players = players
         self.G = nx.path_graph(n)
@@ -18,13 +19,14 @@ class Tablero:
         for x in range(n):
             for y in range(n):
                 count += 1
-                if not (y == n - 1): self.G.add_edge(count, count + 1, peso=1)
-                if not (x == n - 1): self.G.add_edge(count + n, count, peso=1)
+                if not (y == n - 1): self.G.add_edge(count, count + 1)
+                if not (x == n - 1): self.G.add_edge(count + n, count)
                 matriz[x][y] = count
                 self.G.nodes[count]["id"] = count
-                self.G.nodes[count]["color"] = "blanco" 
+                self.G.nodes[count]["color"] = "blanco"
+                self.G.nodes[count]["pos"] = (0, 0) ###  asignar posicion
         self.matriz = matriz
-        
+
     def event(self, event):
         # self.event = event
         pass
@@ -36,21 +38,23 @@ class Tablero:
         count = 0
         for y in range(self.n):
             for x in range(self.n):
-                if count % 2 == 0:
-                    color = (255,255,255)
-                else: 
-                    color = (0,0,0)
+                if count % 2 == 0: color = (255,255,255)
+                else: color = (0,0,0)
                 pygame.draw.rect(screen, color, (x * self.tam , y * self.tam, self.tam, self.tam))
                 count += 1
+                if self.g_coord:
+                    midx = (x * self.tam) + (self.tam / 2)
+                    midy = (y * self.tam) + (self.tam / 2)
+                    self.G.nodes[count]["pos"] = (int(midx), int(midy)) # posicion en el medio del casillero
+        self.g_coord = False
 
     def start(self, size):
         self.place__player_init(size)
         self.players[0].turn = True
 
-    def update(self): 
+    def update(self):
         self.players_path()
-        if self.can_change_turn: 
-            self.turn_management()
+        self.turn_management()
         self.console(False)
 
     def console(self, active):
@@ -63,46 +67,34 @@ class Tablero:
     def turn_management(self):
         for i in range(len(self.players)):
             if self.players[i].turn == True:
-                if i == len(self.players) - 1: # analizo a todos los jugadores
+                if i == len(self.players) - 1: # analizó a todos los jugadores
                     self.players[0].turn = True
                     self.players[i].turn = False
                     return
                 self.players[i + 1].turn = True
                 self.players[i].turn = False
-                return  
+                return
 
-    def can_player_jump(self, destino):
+    def can_player_jump(self, destino, player):
         for enemies in self.players:
             if destino == enemies.origen:
-                return False
-        return True
+                player.origen = enemies.origen
+                return True
+        return False
 
-    def players_path(self): 
+    def players_path(self):
         for player in self.players:
             if player.turn:
                 destino = player.next_movement(player.origen, player.destino, self.G.copy())
-                # if destino == pos.enemy -> lanzar bfs, en la pos del enemigo           
-                self.player_go_to(player, destino)
-                if player.origen != player.destino: # todos lleguen destino
-                    # devuelve si encuentra un jugador em el destino: false
-                    self.can_change_turn = self.can_player_jump(destino)
-                    # to be: analizar dos movimientos decidir saltar
+                # if destino == pos.enemy -> lanzar bfs, en la pos del enemigo
+                if self.can_player_jump(destino, player):
+                    destino = player.next_movement(player.origen, player.destino, self.G.copy())
+                self.player_go_to(player, destino) 
                 player.origen = destino # mueve al jugador en el grafo
                 pygame.time.delay(500)
 
     def player_go_to(self, player, destino):
-        if destino == player.origen - 1:
-            self.move_player(player, mov_x = - player.mov_x)
-        elif destino == player.origen + 1:
-            self.move_player(player, mov_x = player.mov_x)    
-        elif destino < player.origen:
-            self.move_player(player, mov_y = - player.mov_y)
-        elif destino > player.origen:
-            self.move_player(player, mov_y = player.mov_y)
-
-    def move_player(self, player, mov_x = 0, mov_y = 0):
-        player.x += mov_x
-        player.y += mov_y
+        player.x, player.y = self.G.nodes[destino]["pos"]
 
     def place__player_init(self, size):
         self.size = size
@@ -130,5 +122,5 @@ class Tablero:
     def pos_player(self, player, fil, col):
         player.x +=  player.mov_x * col
         player.y +=  player.mov_y * fil
-        player.origen = self.matriz[fil][col]   
+        player.origen = self.matriz[fil][col]
 
