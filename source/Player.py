@@ -1,6 +1,7 @@
 import pygame
 from collections import deque
 
+
 class Player:
 	def __init__(self, fila, columna, n, color):
 		self.x = fila
@@ -10,7 +11,9 @@ class Player:
 		self.origen = 0
 		self.destino = 0
 		self.color = color
+		
 	def event_key(self, event):
+
 		pass
 	
 	def draw(self, screen):

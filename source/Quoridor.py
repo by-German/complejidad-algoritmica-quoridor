@@ -30,9 +30,10 @@ class Quoridor():
 
     def event(self, event):
         self.wall.event(event)
+
         # self.tablero.event_key(event)
-        # for player in self.players:
-        #     player.event_key(event)           
+        # # for player in self.players:
+        # #     player.event_key(event)           
     
 
 

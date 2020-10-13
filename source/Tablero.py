@@ -28,7 +28,6 @@ class Tablero:
         self.matriz = matriz
 
     def event(self, event):
-        # self.event = event
         pass
 
     def draw(self, screen, size):
@@ -54,6 +53,7 @@ class Tablero:
 
     def update(self):
         self.players_path()
+        self.players_wall()
         self.turn_management()
         self.console(False)
 
@@ -86,12 +86,17 @@ class Tablero:
         for player in self.players:
             if player.turn:
                 destino = player.next_movement(player.origen, player.destino, self.G.copy())
-                # if destino == pos.enemy -> lanzar bfs, en la pos del enemigo
-                if self.can_player_jump(destino, player):
+                if self.can_player_jump(destino, player): # caso pueda saltar
                     destino = player.next_movement(player.origen, player.destino, self.G.copy())
                 self.player_go_to(player, destino) 
                 player.origen = destino # mueve al jugador en el grafo
                 pygame.time.delay(500)
+
+
+    def players_wall(self):
+        for player in self.players:
+            pass
+
 
     def player_go_to(self, player, destino):
         player.x, player.y = self.G.nodes[destino]["pos"]
