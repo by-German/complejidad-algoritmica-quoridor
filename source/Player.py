@@ -1,9 +1,10 @@
 import pygame
 from collections import deque
-
+# i:
+from Wall import Wall
 
 class Player:
-	def __init__(self, fila, columna, n, color):
+	def __init__(self, fila, columna, n, color, nro_walls):
 		self.x = fila
 		self.y = columna
 		self.n = n
@@ -11,17 +12,22 @@ class Player:
 		self.origen = 0
 		self.destino = 0
 		self.color = color
+		self.wall = [Wall() for i in range(nro_walls)]	
+
 		
 	def event_key(self, event):
 
 		pass
 	
 	def draw(self, screen):
+		# dibujo del jugador
 		tam = int(200 / self.n )
 		pygame.draw.circle(screen, self.color, (self.x, self.y), tam)
 
-	def update(self):
+		# temp: dibujo del wall
 
+	def update(self):
+		
 		pass
 
 
@@ -60,3 +66,14 @@ class Player:
 			self.hallar_camino(G, s, v["padre"], camino)
 			camino.append(v["id"])
 		return
+
+	# temp
+	def place_wall(self, origen, fin, G):
+		self.wall.origen = origen
+		self.wall.fin = fin
+		G.remove_edge(origen, fin)
+
+	def remove_wall(self, G):
+		G.add_edge(self.wall.orgien, self.wall.fin)
+		# self.wall.
+	 	# podemos retornar la posicion para poner el wall o sino aqui mismo ponerlo

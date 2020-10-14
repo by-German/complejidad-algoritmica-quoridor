@@ -87,7 +87,9 @@ class Tablero:
             if player.turn:
                 destino = player.next_movement(player.origen, player.destino, self.G.copy())
                 if self.can_player_jump(destino, player): # caso pueda saltar
+                    for i in self.players: self.G.nodes[i.origen]["color"] = "negro"
                     destino = player.next_movement(player.origen, player.destino, self.G.copy())
+                    for i in self.players: self.G.nodes[i.origen]["color"] = "blanco"
                 self.player_go_to(player, destino) 
                 player.origen = destino # mueve al jugador en el grafo
                 pygame.time.delay(500)
