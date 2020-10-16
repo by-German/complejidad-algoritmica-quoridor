@@ -24,7 +24,6 @@ class Tablero:
                 matriz[x][y] = count
                 self.G.nodes[count]["id"] = count
                 self.G.nodes[count]["color"] = "blanco"
-                self.G.nodes[count]["pos"] = (0, 0) ###  asignar posicion
         self.matriz = matriz
 
     def event(self, event):
@@ -53,7 +52,6 @@ class Tablero:
 
     def update(self):
         self.players_path()
-        self.players_wall()
         self.turn_management()
         self.console(False)
 
@@ -85,19 +83,31 @@ class Tablero:
     def players_path(self):
         for player in self.players:
             if player.turn:
+                # temp
                 destino = player.next_movement(player.origen, player.destino, self.G.copy())
-                if self.can_player_jump(destino, player): # caso pueda saltar
+                if self.can_player_jump(destino[0], player): # caso pueda saltar
                     for i in self.players: self.G.nodes[i.origen]["color"] = "negro"
                     destino = player.next_movement(player.origen, player.destino, self.G.copy())
                     for i in self.players: self.G.nodes[i.origen]["color"] = "blanco"
-                self.player_go_to(player, destino) 
-                player.origen = destino # mueve al jugador en el grafo
+                self.players_walls(player)
+                self.player_go_to(player, destino[0]) 
+                player.origen = destino[0] # mueve al jugador en el grafo
                 pygame.time.delay(500)
 
-
-    def players_wall(self):
-        for player in self.players:
-            pass
+    def players_walls(self, player):
+        # bloquear al que tiene el camino mas corto
+        # add, siempre en cuando sea mas corto que el propio jugador
+        menor = len(player.camino)
+        p_b = None # bloquear jugador
+        for enemies in self.players:
+            if enemies.origen != player.origen and len(enemies.camino) < menor: # capturar solo enemigos
+                menor = len(enemies.camino)
+                p_b = enemies
+        if p_b == None:
+            return
+        if len(p_b.camino) > 1 and self.G.has_edge(p_b.origen, p_b.camino[2]):
+            print("camino:", p_b.camino)
+            player.place_wall(self.G, origen = p_b.origen, fin = p_b.camino[2])
 
 
     def player_go_to(self, player, destino):

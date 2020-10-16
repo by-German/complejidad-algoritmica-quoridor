@@ -24,7 +24,7 @@ class Quoridor():
     def render(self, screen, size):
         self.tablero.draw(screen, size)
         for player in self.players:
-            player.draw(screen) 
+            player.draw(screen, size) 
         # temp
         # se va dibujar dentro del tablero:
         # self.wall.draw(screen, (255,255,0))
