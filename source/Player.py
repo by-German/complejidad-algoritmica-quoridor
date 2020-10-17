@@ -42,8 +42,8 @@ class Player:
 		self.hallar_camino(G, G.nodes[origen], G.nodes[destino], self.camino)
 		if len(self.camino) == 1: # llego al destino
 			self.camino.append(destino)
-			return self.camino[0:2]
-		return self.camino[1:3] #camino[:2] # return 2 next positions
+			return self.camino[0]# self.camino[0:2]
+		return self.camino[1] #camino[:2] # return 2 next positions
 
 	def BFS(self, G, s):
 		s["color"] = "gris"

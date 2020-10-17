@@ -2,7 +2,6 @@ import pygame, sys
 from Quoridor import Quoridor
 
 pygame.init()
-print("hola")
 
 size = (600, 600)
 screen = pygame.display.set_mode(size)
