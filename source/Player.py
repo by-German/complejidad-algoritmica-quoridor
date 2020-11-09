@@ -35,7 +35,6 @@ class Player:
 	def update(self):
 		pass
 
-
 	def next_movement(self, origen, destino, G): # orgigen posicion jugador
 		self.camino = []
 		self.BFS(G, G.nodes[origen])

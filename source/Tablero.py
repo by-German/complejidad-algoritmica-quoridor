@@ -75,7 +75,7 @@ class Tablero:
 
     def can_player_jump(self, destino, player):
         for enemies in self.players:
-            if destino == enemies.origen:
+            if destino == enemies.origen: # si el destino es un enemigo, entonces puede saltar sobre el 
                 # player.origen = enemies.origen # cuando salta se seguira moviendo pese a poner muros
                 return True
         return False
@@ -83,12 +83,12 @@ class Tablero:
     def players_path(self):
         for player in self.players:
             if player.turn:
-                destino = player.next_movement(player.origen, player.destino, self.G.copy())
+                destino = player.next_movement(player.origen, player.destino, self.G.copy()) # se calcula el destino del jugador
                 if self.can_player_jump(destino, player): # caso pueda saltar
-                    for i in self.players: self.G.nodes[i.origen]["color"] = "negro"
-                    destino = player.next_movement(destino, player.destino, self.G.copy())
-                    for i in self.players: self.G.nodes[i.origen]["color"] = "blanco"
-                if not self.players_walls(player):
+                    for i in self.players: self.G.nodes[i.origen]["color"] = "negro" # poner a los enemigos en negro 
+                    destino = player.next_movement(destino, player.destino, self.G.copy()) # se recalcula el destino del jugador en base al salto
+                    for i in self.players: self.G.nodes[i.origen]["color"] = "blanco" # enemigos de color blanco
+                if not self.players_walls(player): #  Se decide si bloquear o avanzar "en esa misma funcion se coloca el muro"
                     self.player_go_to(player, destino) # mueve al jugador visualmente
                     player.origen = destino # mueve al jugador en el grafo
                 pygame.time.delay(500)
@@ -96,16 +96,19 @@ class Tablero:
     def players_walls(self, player):
         # bloquear al que tiene el camino mas corto
         menor = len(player.camino)
-        p_b = None # bloquear jugador
+        p_b = None # jugador a bloquear ninguno
         for enemies in self.players:
             if enemies.origen != player.origen and len(enemies.camino) < menor: # capturar solo enemigos
-                menor = len(enemies.camino)
+                menor = len(enemies.camino) 
                 p_b = enemies
-        if p_b == None:
+        if p_b == None: # caso p_b no cambie de valor, no se pondra muros
             return False
-        if len(p_b.camino) > 1 and self.G.has_edge(p_b.origen, p_b.camino[2]):
-            player.place_wall(self.G, origen = p_b.origen, fin = p_b.camino[2])
-            return True
+        # caso contrario, se colocara un muro, para el jugador seleccionado
+        if len(p_b.camino) > 1 and self.G.has_edge(p_b.origen, p_b.camino[2]): 
+            player.place_wall(self.G, origen = p_b.origen, fin = p_b.camino[2]) # se coloca el muro en el camino del jugador a bloquear
+            return True 
+
+
 
 
     def player_go_to(self, player, destino):
