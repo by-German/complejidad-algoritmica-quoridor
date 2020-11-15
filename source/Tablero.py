@@ -1,6 +1,7 @@
 import pygame
 import networkx as nx
 from collections import deque
+from dfs_bridge import Dfs
 # temp
 from os import system
 
@@ -49,11 +50,14 @@ class Tablero:
     def start(self, size):
         self.place__player_init(size)
         self.players[0].turn = True
+        self.wallIsPlaced = False #
+        self.bridges = []
 
     def update(self):
         self.players_path()
+        self.wall_controller()
         self.turn_management()
-        self.console(True)
+        self.console(False)
 
     def console(self, active):
         if active:
@@ -103,13 +107,18 @@ class Tablero:
                 p_b = enemies
         if p_b == None: # caso p_b no cambie de valor, no se pondra muros
             return False
-        # caso contrario, se colocara un muro, para el jugador seleccionado
-        if len(p_b.camino) > 1 and self.G.has_edge(p_b.origen, p_b.camino[2]): 
+        # caso contrario, se colocara un muro, para el jugador seleccionado si se cunplen las siguiente condiciones
+        if len(p_b.camino) > 1 and self.G.has_edge(p_b.origen, p_b.camino[2]) and (p_b.origen, p_b.camino[2]) not in self.bridges: # existe arista & no se encierra al jugador
             player.place_wall(self.G, origen = p_b.origen, fin = p_b.camino[2]) # se coloca el muro en el camino del jugador a bloquear
-            return True 
+            self.wallIsPlaced = True
+            # error en camino[2] en un punto, el jugador no tiene ese elemento, "al final del jeugo"
+        return self.wallIsPlaced
 
-
-
+    def wall_controller(self):
+        if self.wallIsPlaced:
+            self.bridges = Dfs.dfs_bridge(self.G.copy(), time = 0, bridges = [])
+            print(self.bridges)
+        self.wallIsPlaced = False
 
     def player_go_to(self, player, destino):
         player.x, player.y = self.G.nodes[destino]["pos"]

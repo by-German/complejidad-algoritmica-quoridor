@@ -82,7 +82,10 @@ class Player:
 		elif yi == yf: ## hotizotal
 			x = abs(xf + xi) // 2
 			self.wall.append(Wall(x, yi - (self.tam // 2), origen, fin, horizontal = False))
-		G.remove_edge(origen, fin)
+		G.remove_edge(origen, fin) # se remueve el muro -- > se quita la arista en el grafo
+
+
+
 
 
 	def remove_wall(self, G):
