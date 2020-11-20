@@ -55,17 +55,17 @@ class Tablero:
         self.bridges = []
 
     def update(self):
+        self.console(True)
         self.players_path()
         self.wall_controller()
         self.turn_management()
-        self.console(False)
         pass
 
     def console(self, active):
         if active:
             system("cls")
             for player in self.players:
-                print("destino: ", player.destino, "origen: ", player.origen, "TURNO:", player.turn)
+                print("color", player.color, "destino: ", player.camino, "origen: ", player.origen, "TURNO:", player.turn)
             print("......................")
 
     def turn_management(self):
@@ -89,10 +89,10 @@ class Tablero:
     def players_path(self):
         for player in self.players:
             if player.turn:
-                destino = player.next_movement(player.origen, player.destino[0], self.G.copy()) # se calcula el destino del jugador
+                destino = player.next_movement(player.origen, player.destino, self.G.copy()) # se calcula el destino del jugador
                 if self.can_player_jump(destino, player): # caso pueda saltar
                     for i in self.players: self.G.nodes[i.origen]["color"] = "negro" # poner a los enemigos en negro 
-                    destino = player.next_movement(destino, player.destino[0], self.G.copy()) # se recalcula el destino del jugador en base al salto
+                    destino = player.next_movement(destino, player.destino, self.G.copy()) # se recalcula el destino del jugador en base al salto
                     for i in self.players: self.G.nodes[i.origen]["color"] = "blanco" # enemigos de color blanco
                 if not self.players_walls(player): #  Se decide si bloquear o avanzar "en esa misma funcion se coloca el muro"
                     self.player_go_to(player, destino) # mueve al jugador visualmente
@@ -100,20 +100,26 @@ class Tablero:
                 pygame.time.delay(500)
 
     def players_walls(self, player):
-        # bloquear al que tiene el camino mas corto
-        menor = len(player.camino)
+        menor = len(player.camino) + 1 # bloquear al que tiene el camino mas corto
         p_b = None # jugador a bloquear ninguno
-        for enemies in self.players:
+        for enemies in self.players: 
             if enemies.origen != player.origen and len(enemies.camino) < menor: # capturar solo enemigos
                 menor = len(enemies.camino) 
                 p_b = enemies
-        if p_b == None: # caso p_b no cambie de valor, no se pondra muros
-            return False
+        if p_b == None: return False # caso p_b no cambie de valor, no se pondra muros            
         # caso contrario, se colocara un muro, para el jugador seleccionado si se cunplen las siguiente condiciones
-        if len(p_b.camino) > 1 and self.G.has_edge(p_b.origen, p_b.camino[2]) and ((p_b.origen, p_b.camino[2]) not in self.bridges): # existe arista & no se encierra al jugador
-            player.place_wall(self.G, origen = p_b.origen, fin = p_b.camino[2]) # se coloca el muro en el camino del jugador a bloquear
+        
+        if len(p_b.camino) > 2 and self.G.has_edge(p_b.origen, p_b.camino[1]) and ((p_b.origen, p_b.camino[1]) not in self.bridges): # existe arista & no se encierra al jugador
+            player.place_wall(self.G, origen = p_b.origen, fin = p_b.camino[1]) # se coloca el muro en el camino del jugador a bloquear
             self.wallIsPlaced = True
             # error en camino[2] en un punto, el jugador no tiene ese elemento, "al final del jeugo"
+        
+        # if len(p_b.camino) > 2:
+        #     final, inicio = len(p_b.camino) - 1, len(p_b.camino) - 2
+        #     if self.G.has_edge(p_b.camino[inicio], p_b.camino[final]) and ((p_b.camino[inicio], p_b.camino[final]) not in self.bridges):
+        #         player.place_wall(self.G, origen = p_b.camino[inicio], fin = p_b.camino[final]) # se coloca el muro en el camino del jugador a bloquear
+        #         self.wallIsPlaced = True
+
         return self.wallIsPlaced
 
     def wall_controller(self):
@@ -128,9 +134,7 @@ class Tablero:
     def player_init(self):
         size = len(self.G)
         n = int(np.sqrt(size))
-        destinos = [list(range(1, n + 1, 1)), list(range(size - n + 1, size + 1, 1)),
-                    list(range(n, size + 1, n)), list(range(1, size - n + 2, n))]
-        
+        destinos = [list(range(1, n + 1, 1)), list(range(size - n + 1, size + 1, 1)), list(range(n, size + 1, n)), list(range(1, size - n + 2, n))]
         temp = 1
         id = int(n / 2)
         for i, destino in enumerate(destinos):

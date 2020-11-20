@@ -34,19 +34,24 @@ class Player:
 	def update(self):
 		pass
 
-	def next_movement(self, origen, destino, G): # orgigen posicion jugador
+	def next_movement(self, origen, destinos, G): # orgigen posicion jugador
 		self.camino = []
+		# lanza bfs
 		self.BFS(G, G.nodes[origen])
-		self.hallar_camino(G, G.nodes[origen], G.nodes[destino], self.camino)
-		if len(self.camino) == 1: # llego al destino
-			self.camino.append(destino)
-			return self.camino[0]# self.camino[0:2]
-		return self.camino[1] #camino[:2] # return 2 next positions
+		# halla camino
+		self.camino = self.road_manager(G, origen, destinos)
+		# self.hallar_camino(G, G.nodes[origen], G.nodes[destino], self.camino)
+		if len(self.camino) == 0: return self.origen
+		return self.camino[0]
+		# if len(self.camino) == 1: # llego al destino
+		# 	self.camino.append(destino)
+		# 	return self.camino[0]# self.camino[0:2]
+		# return self.camino[1] #camino[:2] # return 2 next positions
 
 	def BFS(self, G, s):
 		s["color"] = "gris"
 		s["distancia"] = 0
-		s["padre"] = None
+		s["p"] = None
 		Q = deque()
 		Q.append(s)  # enqueue
 		while not (Q == deque([])):
@@ -56,26 +61,30 @@ class Player:
 				if nodo["color"] == "blanco":
 					nodo["color"] = "gris"
 					nodo["distancia"] = u["distancia"] + 1
-					nodo["padre"] = u # -> u = nodo
+					nodo["p"] = u # -> u = nodo
 					Q.append(nodo)
 			u["color"] = "negro"
 		return
 
+	def road_manager(self, G, origen, destinos) -> list:
+		caminos = [[] for _ in range(len(destinos))]
+		for id, destino in enumerate(destinos): self.hallar_camino(G, G.nodes[origen], G.nodes[destino], caminos[id])
+		camino = caminos[0]
+		for id, road in enumerate(caminos):
+			if len(camino) > len(road): camino = road
+		return camino
+
 	def hallar_camino(self, G, s, v, camino):
 		if v["id"] == s["id"]:
-			camino.append(s["id"]) # agrega el ultimo camino faltante
-		elif v["padre"] == None: 
+			# camino.append(s["id"]) # agrega el ultimo camino faltante
+			pass
+		elif v["p"] == None: 
 			print("No existe camino de {} a {}".format(s["id"], v["id"]))
 		else:
-			self.hallar_camino(G, s, v["padre"], camino)
+			self.hallar_camino(G, s, v["p"], camino)
 			camino.append(v["id"]) # agrega todos los caminos 
 		return
 
-	# def road_manager(G, destinos):
-	# 	for id, destino in enumerate(destinos):
-	# 		self.hallar_camino(G, G.nodes[origen], G.nodes[destino], camino)
-
-	# temp
 	def place_wall(self, G, origen, fin):
 		xi, yi = G.nodes[origen]["pos"]
 		xf, yf = G.nodes[fin]["pos"]
@@ -88,7 +97,8 @@ class Player:
 		G.remove_edge(origen, fin) # se remueve el muro -- > se quita la arista en el grafo
 
 	def remove_wall(self, G):
-		self.wall.pop()
-		G.add_edge(self.wall.orgien, self.wall.fin)
+		# self.wall.pop()
+		# G.add_edge(self.wall.orgien, self.wall.fin)
 		# self.wall.
 	 	# podemos retornar la posicion para poner el wall o sino aqui mismo ponerlo
+		pass
