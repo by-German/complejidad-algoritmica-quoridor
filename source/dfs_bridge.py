@@ -35,6 +35,8 @@ class Dfs:
                 u['low'] = min(u['low'], v['low'])
                 if v['low'] > u['disc']:
                     bridges.append((u['id'], v['id']))
+                    bridges.append((v['id'], u['id'])) # para que sea bidireccional
             elif v != u['p']:
                 u['low'] = min(u['low'], v['disc']) # Actualizar el valor bajo de u para llamadas a funciones principales
-     
+    
+        

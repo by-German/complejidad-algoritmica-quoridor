@@ -31,7 +31,6 @@ class Player:
 		for wall in self.wall:
 			wall.draw(screen, self.color, self.tam)
 	
-
 	def update(self):
 		pass
 
@@ -64,13 +63,17 @@ class Player:
 
 	def hallar_camino(self, G, s, v, camino):
 		if v["id"] == s["id"]:
-			camino.append(s["id"])
-		elif v["padre"] == None:
+			camino.append(s["id"]) # agrega el ultimo camino faltante
+		elif v["padre"] == None: 
 			print("No existe camino de {} a {}".format(s["id"], v["id"]))
 		else:
 			self.hallar_camino(G, s, v["padre"], camino)
-			camino.append(v["id"])
+			camino.append(v["id"]) # agrega todos los caminos 
 		return
+
+	# def road_manager(G, destinos):
+	# 	for id, destino in enumerate(destinos):
+	# 		self.hallar_camino(G, G.nodes[origen], G.nodes[destino], camino)
 
 	# temp
 	def place_wall(self, G, origen, fin):
@@ -83,10 +86,6 @@ class Player:
 			x = abs(xf + xi) // 2
 			self.wall.append(Wall(x, yi - (self.tam // 2), origen, fin, horizontal = False))
 		G.remove_edge(origen, fin) # se remueve el muro -- > se quita la arista en el grafo
-
-
-
-
 
 	def remove_wall(self, G):
 		self.wall.pop()
