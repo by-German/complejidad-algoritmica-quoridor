@@ -1,7 +1,11 @@
 import pygame
 from collections import deque
-# i:
 from Wall import Wall
+##
+import itertools as itr
+import heapq as hq
+import numpy as np
+
 
 class Player:
 	def __init__(self, fila, columna, n, color, nro_walls):
@@ -36,17 +40,11 @@ class Player:
 
 	def next_movement(self, origen, destinos, G): # orgigen posicion jugador
 		self.camino = []
-		# lanza bfs
 		self.BFS(G, G.nodes[origen])
-		# halla camino
 		self.camino = self.road_manager(G, origen, destinos)
-		# self.hallar_camino(G, G.nodes[origen], G.nodes[destino], self.camino)
+		# self.camino = self.a_star_multiple(G, origen, destinos)
 		if len(self.camino) == 0: return self.origen
 		return self.camino[0]
-		# if len(self.camino) == 1: # llego al destino
-		# 	self.camino.append(destino)
-		# 	return self.camino[0]# self.camino[0:2]
-		# return self.camino[1] #camino[:2] # return 2 next positions
 
 	def BFS(self, G, s):
 		s["color"] = "gris"
@@ -95,6 +93,63 @@ class Player:
 			x = abs(xf + xi) // 2
 			self.wall.append(Wall(x, yi - (self.tam // 2), origen, fin, horizontal = False))
 		G.remove_edge(origen, fin) # se remueve el muro -- > se quita la arista en el grafo
+
+	def a_star(self, G, inicial, final):
+		push = hq.heappush
+		pop = hq.heappop
+		contar = itr.count()
+		cola = [(0, next(contar), inicial, 0, None)]
+		en_cola = {}
+		explorados = {}
+		while cola:
+			_, __, actual, dist, padre = pop(cola)
+
+			if actual == final:
+				camino = [actual]
+				nodo = padre
+				while nodo is not None:
+					camino.append(nodo)
+					nodo = explorados[nodo]
+				camino.reverse()
+				return camino
+
+			if actual in explorados:
+				if explorados[actual] is None:
+					continue
+				qcosto, h = en_cola[actual]
+				if qcosto < dist:
+					continue
+
+			explorados[actual] = padre
+
+			for vecino, w in G[actual].items():
+				ncosto = dist + 1
+				if vecino in en_cola:
+					qcosto, h = en_cola[vecino]
+					if qcosto <= ncosto:
+						continue
+				else:
+					h = 0
+				en_cola[vecino] = ncosto, h
+				push(cola, (ncosto + h, next(contar), vecino, ncosto, actual))
+
+		print("Camino no disponible")
+
+
+	def a_star_multiple(self, G, inicial, finales):
+		minimo = np.inf
+		min_path = []
+		for final in finales:
+			path = self.a_star(G,inicial,final)
+			if len(path) < minimo:
+				min_path = path
+				minimo = len(path)
+		if len(min_path):
+			min_path = min_path[1:]
+		return min_path
+
+
+
 
 	def remove_wall(self, G):
 		# self.wall.pop()
