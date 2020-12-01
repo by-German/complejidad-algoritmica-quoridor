@@ -1,4 +1,4 @@
-# Presentacion del trabajo Final
+# Quoridor TF
 
 Integrantes:
 
