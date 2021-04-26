@@ -1,7 +1,7 @@
 # Quoridor TF
 
-Integrantes:
+## Integrantes:
 
-Mamani Rojas, Brayan German     U20161C629
+- Mamani Rojas, Brayan German     U20161C629
 
-Vital Rodrìgeuz, Jorge Daniel   U201718971
+- Vital Rodrìgeuz, Jorge Daniel   U201718971
