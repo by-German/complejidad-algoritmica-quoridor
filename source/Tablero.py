@@ -113,13 +113,6 @@ class Tablero:
             player.place_wall(self.G, origen = p_b.origen, fin = p_b.camino[1]) # se coloca el muro en el camino del jugador a bloquear
             self.wallIsPlaced = True
             # error en camino[2] en un punto, el jugador no tiene ese elemento, "al final del jeugo"
-        
-        # if len(p_b.camino) > 2:
-        #     final, inicio = len(p_b.camino) - 1, len(p_b.camino) - 2
-        #     if self.G.has_edge(p_b.camino[inicio], p_b.camino[final]) and ((p_b.camino[inicio], p_b.camino[final]) not in self.bridges):
-        #         player.place_wall(self.G, origen = p_b.camino[inicio], fin = p_b.camino[final]) # se coloca el muro en el camino del jugador a bloquear
-        #         self.wallIsPlaced = True
-
         return self.wallIsPlaced
 
     def wall_controller(self):
@@ -143,3 +136,4 @@ class Tablero:
             self.players[i].origen = destinos[i + temp][id]
             self.player_go_to(self.players[i], self.players[i].origen)
             temp *= -1
+        

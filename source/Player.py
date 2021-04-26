@@ -40,9 +40,9 @@ class Player:
 
 	def next_movement(self, origen, destinos, G): # orgigen posicion jugador
 		self.camino = []
-		self.BFS(G, G.nodes[origen])
-		self.camino = self.road_manager(G, origen, destinos)
-		# self.camino = self.a_star_multiple(G, origen, destinos)
+		# self.BFS(G, G.nodes[origen])
+		# self.camino = self.road_manager(G, origen, destinos)
+		self.camino = self.a_star_multiple(G, origen, destinos)
 		if len(self.camino) == 0: return self.origen
 		return self.camino[0]
 
